@@ -126,6 +126,9 @@ class SnowflakeDialect(default.DefaultDialect):
     # The dialect supports comments
     supports_comments = True
 
+    # The dialect supports server-side cursors
+    supports_server_side_cursors = True
+
     preparer = SnowflakeIdentifierPreparer
     ddl_compiler = SnowflakeDDLCompiler
     type_compiler = SnowflakeTypeCompiler
@@ -136,6 +139,10 @@ class SnowflakeDialect(default.DefaultDialect):
     # within the database. If this is True, the methods normalize_name()
     # and denormalize_name() must be provided.
     requires_name_normalize = True
+
+    def __init__(self, server_side_cursors=False, **kwargs):
+        super().__init__(**kwargs)
+        self.server_side_cursors = server_side_cursors
 
     @classmethod
     def dbapi(cls):

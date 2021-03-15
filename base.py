@@ -8,7 +8,7 @@ import operator
 import re
 
 from sqlalchemy import util as sa_util
-from sqlalchemy.engine import default
+from sqlalchemy.engine import default, result as _result
 from sqlalchemy.schema import Table
 from sqlalchemy.sql import compiler, expression
 from sqlalchemy.sql.elements import quoted_name
@@ -301,6 +301,16 @@ class SnowflakeExecutionContext(default.DefaultExecutionContext):
             return self.should_autocommit_text(self.unicode_statement)
         else:
             return autocommit and not self.isddl
+
+    def create_server_side_cursor(self):
+        return self._dbapi_connection.cursor()
+
+    def get_result_proxy(self):
+        if self._is_server_side:
+            return _result.BufferedRowResultProxy(self)
+        else:
+            return _result.ResultProxy(self)
+
 
 
 class SnowflakeDDLCompiler(compiler.DDLCompiler):
